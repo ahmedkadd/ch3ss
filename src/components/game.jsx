@@ -231,7 +231,7 @@ export default class LiveGame extends Component {
         animate();
 
         function animate() {
-            requestAnimationFrame(animate);
+          requestAnimationFrame(animate);
 	        render();
 	        update();
         }
@@ -243,44 +243,44 @@ export default class LiveGame extends Component {
         }
 
         function render() {
-	        renderer.render( scene, camera );
+	        renderer.render(scene, camera);
         }
 
         function onMouseDown( event ) {
-	        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-            let ray = new THREE.Raycaster();
-            ray.setFromCamera(mouse, camera);
-            let intersects = ray.intersectObjects(scene.children, true);
+          mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+          mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+          let ray = new THREE.Raycaster();
+          ray.setFromCamera(mouse, camera);
+          let intersects = ray.intersectObjects(scene.children, true);
 
-            if (PIECE_SELECTION_MODE) {
-                let aPieceWasSelected = false;
-                let intersection = -1;
+          if (PIECE_SELECTION_MODE) {
+            let aPieceWasSelected = false;
+            let intersection = -1;
 
-                if (intersects.length > 0) {
-                    for (let i = 0; i < intersects.length; i++) {
-                        if (intersects[i].object.userData.type === "piece") {
-                            aPieceWasSelected = true;
-                            intersection = i;
-                            break;
-                        }
-                    }
+            if (intersects.length > 0) {
+              for (let i = 0; i < intersects.length; i++) {
+                if (intersects[i].object.userData.type === "piece") {
+                  aPieceWasSelected = true;
+                  intersection = i;
+                  break;
                 }
-
-                if (aPieceWasSelected) {
-                    if (SELECTED_PIECE !== null && SELECTED_PIECE !== intersects[intersection].object) {
-                        unhighlightSelectedPiece();
-                    }
-
-                    SELECTED_PIECE = intersects[intersection].object;
-                    unhighlightSpaces();
-                    highlightSelectedPiece();
-                    setValidSpaces();
-                    highlightValidSpaces();
-                }
+              }
             }
+
+            if (aPieceWasSelected) {
+              if (SELECTED_PIECE !== null && SELECTED_PIECE !== intersects[intersection].object) {
+                unhighlightSelectedPiece();
+              }
+
+              SELECTED_PIECE = intersects[intersection].object;
+              unhighlightSpaces();
+              highlightSelectedPiece();
+              setValidSpaces();
+              highlightValidSpaces();
+            }
+          }
         }
-    }
+      }
 
     render() {
         return (
