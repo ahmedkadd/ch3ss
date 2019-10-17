@@ -11,8 +11,13 @@ import { Pawn } from "@rahoi/ch3ss_logic/dist/Pawn";
 import { Queen } from "@rahoi/ch3ss_logic/dist/Queen";
 import { BLACK, WHITE } from "@rahoi/ch3ss_logic/dist/constants";
 
-const whiteMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
-const blackMaterial = new THREE.MeshLambertMaterial({color: 0x000000});
+const WHITE_COLOR = 0xffffff;
+const BLACK_COLOR = 0x000000;
+const BOARD_COLOR = 0xfdfdfd;
+const SELECTED_COLOR = 0xff0000;
+
+const whiteMaterial = new THREE.MeshLambertMaterial({color: WHITE_COLOR});
+const blackMaterial = new THREE.MeshLambertMaterial({color: BLACK_COLOR});
 
 const pawnGeometry = new THREE.SphereGeometry(0.3, 16, 12);
 const rookGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -22,7 +27,8 @@ const unicornGeometry = new THREE.IcosahedronGeometry(0.3);
 const kingGeometry = new THREE.TetrahedronGeometry(0.5);
 const queenGeometry = new THREE.ConeGeometry(0.25, 0.75, 16);
 
-const boardMaterial = new THREE.MeshLambertMaterial({color: 0xfdfdfd, transparent: true, opacity: 0.05});const boardGeometry = new THREE.BoxGeometry(1, 1, 1);
+const boardMaterial = new THREE.MeshLambertMaterial({color: BOARD_COLOR, transparent: true, opacity: 0.05});
+const boardGeometry = new THREE.BoxGeometry(1, 1, 1);
 const boardDimension = 5;
 const board = new THREE.Group();
 
@@ -36,7 +42,7 @@ function buildBoard(scene) {
             for (let z = 0; z < boardDimension; z++) {
                 const cube = new THREE.Mesh(boardGeometry, boardMaterial.clone());
                 cube.position.set(x - 2, y - 2, z - 2);
-                
+
                 cube.userData.x = x;
                 cube.userData.y = y;
                 cube.userData.z = z;
@@ -50,28 +56,25 @@ function buildBoard(scene) {
     scene.add(board);
 }
 
-function buildPieces() {
-
-}
-
 function getGamePositionFromObject(object) {
     let position_3D = object.position;
-    let gamePosition;
+
     let x = position_3D.x + 3;
     let y = position_3D.y + 3;
     let z = position_3D.z + 3;
 
     let positionString = x.toString() + y.toString() + z.toString();
-    
-    gamePosition = currentGame.getPositionFromString(positionString);
-     
+
+    let gamePosition = currentGame.getPositionFromString(positionString);
+
     return gamePosition;
 }
 
 function setValidSpaces() {
-    let validSpaces = [];
     let piecePosition = getGamePositionFromObject(SELECTED_PIECE);
     let validPositions = currentGame.getPossibleMovesForPieceAtSpace(piecePosition);
+
+    let validSpaces = [];
     let position;
     let space;
 
@@ -93,25 +96,25 @@ function highlightValidSpaces() {
     if (VALID_SPACES != null) {
         for (let i = 0; i < VALID_SPACES.length; i++) {
             let space = VALID_SPACES[i];
-            space.material.color.setHex(0xff0000);
+            space.material.color.setHex(SELECTED_COLOR);
         }
     }
 }
 
 function highlightSelectedPiece() {
     if (SELECTED_PIECE !== null) {
-        SELECTED_PIECE.material.color.setHex(0xff0000);
-    } 
+        SELECTED_PIECE.material.color.setHex(SELECTED_COLOR);
+    }
 }
 
 function unhighlightSelectedPiece() {
     if (SELECTED_PIECE != null) {
         if (SELECTED_PIECE.userData.color === "white") {
-            SELECTED_PIECE.material.color.setHex(0xd3d3d3);
+            SELECTED_PIECE.material.color.setHex(WHITE_COLOR);
         }
-    
+
         if (SELECTED_PIECE.userData.color === "black") {
-            SELECTED_PIECE.material.color.setHex(0x000000);
+            SELECTED_PIECE.material.color.setHex(BLACK_COLOR);
         }
     }
 }
@@ -120,7 +123,7 @@ function unhighlightSpaces() {
     if (VALID_SPACES != null) {
         for (let i = 0; i < VALID_SPACES.length; i++) {
             let space = VALID_SPACES[i];
-            space.material.color.setHex(0xfdfdfd);
+            space.material.color.setHex(BOARD_COLOR);
         }
     }
 }
@@ -166,7 +169,7 @@ function createPieceMesh(piece, group) {
     }
 
     newPiece.userData.type = "piece";
-    
+
     let newPosition = piece.getPosition();
 
     newPiece.position.set(newPosition.getX() - 3, newPosition.getY() - 3, newPosition.getZ() - 3);
@@ -200,11 +203,11 @@ export default class LiveGame extends Component {
 
         let currentPieces = currentGame.getPieces();
         let {pieces, liveGame} = this.props
-        
+
         if(liveGame !== undefined) {
             currentPieces = pieces;
         }
-        
+
         let whitePiecesGroup = new THREE.Group();
         let blackPiecesGroup = new THREE.Group();
 
@@ -212,7 +215,7 @@ export default class LiveGame extends Component {
             if (currentPieces[i].color === WHITE) {
                 createPieceMesh(currentPieces[i], whitePiecesGroup);
             }
-            
+
             if (currentPieces[i].color === BLACK) {
                 createPieceMesh(currentPieces[i], blackPiecesGroup);
             }
@@ -229,7 +232,7 @@ export default class LiveGame extends Component {
 
         function animate() {
             requestAnimationFrame(animate);
-	        render();		
+	        render();
 	        update();
         }
 
@@ -253,7 +256,7 @@ export default class LiveGame extends Component {
             if (PIECE_SELECTION_MODE) {
                 let aPieceWasSelected = false;
                 let intersection = -1;
-                
+
                 if (intersects.length > 0) {
                     for (let i = 0; i < intersects.length; i++) {
                         if (intersects[i].object.userData.type === "piece") {
@@ -262,20 +265,20 @@ export default class LiveGame extends Component {
                             break;
                         }
                     }
-                }          
-                
+                }
+
                 if (aPieceWasSelected) {
                     if (SELECTED_PIECE !== null && SELECTED_PIECE !== intersects[intersection].object) {
                         unhighlightSelectedPiece();
                     }
-            
+
                     SELECTED_PIECE = intersects[intersection].object;
                     unhighlightSpaces();
                     highlightSelectedPiece();
                     setValidSpaces();
                     highlightValidSpaces();
                 }
-            } 
+            }
         }
     }
 
